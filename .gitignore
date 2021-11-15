@@ -1,0 +1,4 @@
+configs.json
+certs/
+zonefiles/
+coredns-auto-updater
