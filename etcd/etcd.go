@@ -115,6 +115,7 @@ type ZonefileEvent struct {
 func (cli *EtcdClient) WatchZonefiles(etcdKeyPrefix string, revision int64, events chan ZonefileEvent) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+	defer close(events)
 	wc := cli.Client.Watch(ctx, etcdKeyPrefix, clientv3.WithPrefix(), clientv3.WithRev(revision))
 	if wc == nil {
 		events <- ZonefileEvent{Err: errors.New("Failed to watch zonefiles changes: Watcher could not be established")}
