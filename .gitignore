@@ -1,4 +1,4 @@
-configs.json
+/configs.json
 certs/
 zonefiles/
 coredns-auto-updater
