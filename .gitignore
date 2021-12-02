@@ -2,3 +2,4 @@
 certs/
 zonefiles/
 coredns-auto-updater
+integration-tests/coredns-auto-updater-integration-tests
