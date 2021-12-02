@@ -1,0 +1,8 @@
+{
+    "ZonefilesPath": "./zonefiles",
+    "EtcdEndpoints": "127.0.0.1:32379",
+    "CaCertPath": "./certs/ca.pem",
+    "UserCertPath": "./certs/root.pem",
+    "UserKeyPath": "./certs/root.key",
+    "EtcdKeyPrefix": "/dns/"
+}

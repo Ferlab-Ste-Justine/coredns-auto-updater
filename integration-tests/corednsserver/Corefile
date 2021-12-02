@@ -1,0 +1,12 @@
+.:5353 {
+    bind 0.0.0.0
+    auto {
+        directory ./zonefiles (.*) {1}
+        reload 1s
+    }
+    reload 5s
+    loop
+    nsid tests
+    errors
+    log
+}
