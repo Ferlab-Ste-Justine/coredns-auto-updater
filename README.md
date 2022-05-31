@@ -20,19 +20,19 @@ The **configs.json** file is as follows:
 
 ```
 {
-	ZonefilesPath: "Path where zonefiles are to be outputed",
-	EtcdKeyPrefix: "Etcd key prefix that the tool will watch on for zonefiles. Suffixes to the prefix should be domain names containing a zonefile",
-	EtcdEndpoints: "Command separated list containing entries wwith the format: <ip>:<port>"
-	CaCertPath: "Path to the CA certificate that signed the etcd servers' certificates",
-	UserAuth: {
+    ZonefilesPath: "Path where zonefiles are to be outputed",
+    EtcdKeyPrefix: "Etcd key prefix that the tool will watch on for zonefiles. Suffixes to the prefix should be domain names containing a zonefile",
+    EtcdEndpoints: "Command separated list containing entries wwith the format: <ip>:<port>"
+    CaCertPath: "Path to the CA certificate that signed the etcd servers' certificates",
+    UserAuth: {
         CertPath: "Path to a client certificate. If non-empty,should be accompanied by KeyPath and Username/Password should be empty",
         KeyPath: "Path to a client key",
         Username: "Client username. If non-empty, should be accompanied by by Password and CertPath/KeyPath should be empty",
         Password: "Client password"
     },
-	ConnectionTimeout: Connection timeout (number of seconds as integer),
-	RequestTimeout: Request timeout (number of seconds as integer),
-	RequestRetries: Number of times a failing request should be attempted before exiting on failure, 
+    ConnectionTimeout: Connection timeout (number of seconds as integer),
+    RequestTimeout: Request timeout (number of seconds as integer),
+    RequestRetries: Number of times a failing request should be attempted before exiting on failure, 
 }
 ```
 
