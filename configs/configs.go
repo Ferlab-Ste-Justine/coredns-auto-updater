@@ -9,13 +9,19 @@ import (
 	"strconv"
 )
 
+type UserAuth struct {
+	CertPath      string
+	KeyPath       string
+	Username      string
+	Password      string
+}
+
 type Configs struct {
 	ZonefilesPath     string
 	EtcdKeyPrefix     string
 	EtcdEndpoints     string
 	CaCertPath        string
-	UserCertPath      string
-	UserKeyPath       string
+	UserAuth          UserAuth
 	ConnectionTimeout uint64
 	RequestTimeout    uint64
 	RequestRetries    uint64
@@ -41,12 +47,11 @@ func checkConfigsIntegrity(c Configs) error {
 		return errors.New("Configuration error: CA certificate path cannot be empty")
 	}
 
-	if c.UserCertPath == "" {
-		return errors.New("Configuration error: User certificate path cannot be empty")
-	}
+	noValidAuth := (c.UserAuth.CertPath == "" || c.UserAuth.KeyPath == "") && (c.UserAuth.Username == "" || c.UserAuth.Password == "")
+	ambiguousAuthMethod := (c.UserAuth.CertPath != "" || c.UserAuth.KeyPath != "") && (c.UserAuth.Username != "" || c.UserAuth.Password != "")
 
-	if c.UserKeyPath == "" {
-		return errors.New("Configuration error: User key path cannot be empty")
+	if noValidAuth || ambiguousAuthMethod {
+		return errors.New("Configuration error: Either user certificate AND key path should not be empty XOR user name AND password should not be empty")
 	}
 
 	if c.EtcdKeyPrefix == "" {
@@ -85,16 +90,22 @@ func GetConfigs() (Configs, error) {
 		if err != nil {
 			return Configs{}, errors.New("Error fetching configuration environment variables: REQUEST_RETRIES must be an unsigned integer")
 		}
-		
-		c.ZonefilesPath = os.Getenv("ZONEFILE_PATH")
-		c.EtcdEndpoints = os.Getenv("ETCD_ENDPOINTS")
-		c.CaCertPath = os.Getenv("CA_CERT_PATH")
-		c.UserCertPath = os.Getenv("USER_CERT_PATH")
-		c.UserKeyPath = os.Getenv("USER_KEY_PATH")
-		c.EtcdKeyPrefix = os.Getenv("ETCD_KEY_PREFIX")
 		c.ConnectionTimeout = connectionTimeout
 		c.RequestTimeout = requestTimeout
 		c.RequestRetries = requestRetries
+
+		userAuth := UserAuth{
+			CertPath: getEnv("USER_CERT_PATH", ""),
+			KeyPath: getEnv("USER_KEY_PATH", ""),
+			Username: getEnv("USER_NAME", ""),
+			Password: getEnv("USER_PASSWORD", ""),
+		}
+		c.UserAuth = userAuth
+
+		c.ZonefilesPath = os.Getenv("ZONEFILE_PATH")
+		c.EtcdEndpoints = os.Getenv("ETCD_ENDPOINTS")
+		c.CaCertPath = os.Getenv("CA_CERT_PATH")
+		c.EtcdKeyPrefix = os.Getenv("ETCD_KEY_PREFIX")
 	} else {
 		return Configs{}, errors.New(fmt.Sprintf("Error reading configuration file: %s", err.Error()))
 	}

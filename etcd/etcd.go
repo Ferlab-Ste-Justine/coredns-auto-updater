@@ -24,7 +24,9 @@ type EtcdClient struct {
 
 func Connect(
 	userCertPath string, 
-	userKeyPath string, 
+	userKeyPath string,
+	Username string,
+	Password string, 
 	caCertPath string, 
 	etcdEndpoints string, 
 	connectionTimeout uint64,
@@ -34,11 +36,14 @@ func Connect(
 	tlsConf := &tls.Config{}
 
 	//User credentials
-	certData, err := tls.LoadX509KeyPair(userCertPath, userKeyPath)
-	if err != nil {
-		return nil, errors.New(fmt.Sprintf("Failed to load user credentials: %s", err.Error()))
+	if Username == "" {
+		certData, err := tls.LoadX509KeyPair(userCertPath, userKeyPath)
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("Failed to load user credentials: %s", err.Error()))
+		}
+		(*tlsConf).Certificates = []tls.Certificate{certData}
 	}
-	(*tlsConf).Certificates = []tls.Certificate{certData}
+
 	(*tlsConf).InsecureSkipVerify = false
 	
 	//CA cert
@@ -54,14 +59,27 @@ func Connect(
 	(*tlsConf).RootCAs = roots
 	
 	//Connection
-	cli, err := clientv3.New(clientv3.Config{
-		Endpoints:   strings.Split(etcdEndpoints, ","),
-		TLS:         tlsConf,
-		DialTimeout: time.Duration(connectionTimeout) * time.Second,
-	})
+	var cli *clientv3.Client
+	var connErr error
+
+	if Username == "" {
+		cli, connErr = clientv3.New(clientv3.Config{
+			Endpoints:   strings.Split(etcdEndpoints, ","),
+			TLS:         tlsConf,
+			DialTimeout: time.Duration(connectionTimeout) * time.Second,
+		})
+	} else {
+		cli, connErr = clientv3.New(clientv3.Config{
+			Username: Username,
+			Password: Password,
+			Endpoints:   strings.Split(etcdEndpoints, ","),
+			TLS:         tlsConf,
+			DialTimeout: time.Duration(connectionTimeout) * time.Second,
+		})
+	}
 	
-	if err != nil {
-		return nil, errors.New(fmt.Sprintf("Failed to connect to etcd servers: %s", err.Error()))
+	if connErr != nil {
+		return nil, errors.New(fmt.Sprintf("Failed to connect to etcd servers: %s", connErr.Error()))
 	}
 	
 	return &EtcdClient{
