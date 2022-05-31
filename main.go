@@ -17,7 +17,17 @@ func syncZonefiles() error {
 
 	filesystem.EnsureZonefilesDir(confs.ZonefilesPath)
 
-	cli, connErr := etcd.Connect(confs.UserCertPath, confs.UserKeyPath, confs.CaCertPath, confs.EtcdEndpoints, confs.ConnectionTimeout, confs.RequestTimeout, confs.RequestRetries)
+	cli, connErr := etcd.Connect(
+		confs.UserAuth.CertPath, 
+		confs.UserAuth.KeyPath, 
+		confs.UserAuth.Username,
+		confs.UserAuth.Password,
+		confs.CaCertPath, 
+		confs.EtcdEndpoints, 
+		confs.ConnectionTimeout, 
+		confs.RequestTimeout, 
+		confs.RequestRetries,
+	)
 	if connErr != nil {
 		return connErr	
 	}
