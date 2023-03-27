@@ -1,3 +1,9 @@
+# Archival Notice
+
+The following project is a more generic implementation of the features provided by this project that can be used for zonefiles and other things: https://github.com/Ferlab-Ste-Justine/configurations-auto-updater
+
+As such, we're archiving this project and will maintain the above project instead in the future.
+
 # About
 
 This is a tool to read fully defined zonefiles under a given etcd prefix path and keep a local directory updated with those zonefiles (creating them, updating them or deleting them as necessary).
